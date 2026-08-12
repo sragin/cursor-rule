@@ -17,27 +17,20 @@
 
 | 항목 | 값 |
 | --- | --- |
-| 작업 머신 | GRAM-16ZD90TR |
-| 브랜치 | master |
-| 마지막 커밋 | 45b16ce feat: CLAUDE 룰, 스킬 추가 |
-| 작업 트리 | 미커밋 변경 있음 — `M CLAUDE.md`, `?? .claude/`, `?? .gitignore`, `?? memory.md` |
+| 작업 머신 | GRAM-16ZD90TR (역할: 노트북) |
+| 브랜치 | master (origin/master 와 동일, `0 0`) |
+| 마지막 커밋 | 57db9e3 feat: 머신 간 인계 구조 추가 |
+| 작업 트리 | 내용 변경 없음. `git status` 가 `M CLAUDE.md` 를 표시하나 `git diff` 는 빈 출력이고 워킹 파일 해시와 HEAD 블롭 해시가 `dd04c7f5` 로 동일하다. `core.autocrlf=true` 로 워킹 6145 바이트(CRLF) / 블롭 6079 바이트(LF) 크기가 달라 stat 캐시만 dirty 한 상태다. |
 
 **진행 중인 작업**
 - 머신 간 인계 구조 최초 구축(`memory.md`, `/pickup`, `/handoff`, `.claude/rules/field-test.md`, `CLAUDE.local.md`, `.gitignore`).
+- 이 저장소는 **뼈대(템플릿)** 다. 위 파일들을 모든 저장소에 반영해 사용한다.
 
 **미해결 이슈**
-- 두 머신의 이름과 역할(사무실 PC / 노트북) 매핑이 미확정. 현재 머신 이름 `GRAM-16ZD90TR` 만 확인됨. 나머지 머신 이름은 해당 머신에서 `$env:COMPUTERNAME` 으로 확인해 "환경 차이" 표에 채운다.
-- `.claude/rules/field-test.md` 의 **안전** 및 **실차 상태에서 금지하는 동작** 섹션이 TODO 상태. 사용자가 채워야 한다.
-- `CLAUDE.md` 에 미커밋 변경(`M CLAUDE.md`)이 남아 있다. 커밋 여부 미결정.
-- 로컬 폴더 이름이 아직 `ai_rule` 이다. `ai-rule` 로 변경 예정. 세션 실행 중에는 Windows 가 작업 디렉터리를 잠가 변경 불가(실제 시도해 `being used by another process` 확인). 세션 종료 후 변경해야 한다.
+- 사무실 PC 의 머신 이름이 미확인. `GRAM-16ZD90TR` = 노트북 은 확정됨(`CLAUDE.local.md` 의 역할 항목). 사무실 PC 이름은 해당 머신에서 `$env:COMPUTERNAME` 으로 확인해 "환경 차이" 표에 채운다.
 
 **다음 머신에서 할 일**
-1. 해당 머신에서 `CLAUDE.local.md` 를 생성하고 머신 이름·역할·저장소 경로·실차 접속 가능 여부·로컬 실행 환경을 채운다(gitignore 대상이라 동기화되지 않음).
-2. `.claude/rules/field-test.md` 의 **안전** 섹션 TODO 를 실제 절차로 채운다.
-3. `.claude/rules/field-test.md` 의 **실차 상태에서 금지하는 동작** 섹션 TODO 를 채운다.
-4. `CLAUDE.md` 미커밋 변경의 처리(커밋 또는 되돌리기)를 결정한다.
-5. 이 머신의 remote URL 을 새 이름으로 맞춘다. remote 설정은 `.git/config` 에 있어 머신 간 동기화되지 않는다:
-   `git remote set-url origin git@github.com:sragin/ai-rule.git`
+1. 사무실 PC 에서 `$env:COMPUTERNAME` 을 확인해 "환경 차이" 표의 머신 이름을 채운다.
 
 ## 환경 차이
 
@@ -45,7 +38,7 @@
 
 | 항목 | 사무실 PC | 노트북 | 실제 값 위치 |
 | --- | --- | --- | --- |
-| 머신 이름 | (미확인) | (미확인, 현재 머신 후보: GRAM-16ZD90TR) | `CLAUDE.local.md` |
+| 머신 이름 | (미확인) | GRAM-16ZD90TR | `CLAUDE.local.md` |
 | 실차 네트워크 접속 | 불가 | 가능(실차와 동일 로컬 네트워크) | — |
 | 실차 IP·포트·시리얼명 | 해당 없음 | 있음 | `CLAUDE.local.md`, `.env` |
 | 저장소 경로 | 다름 | 다름 | `CLAUDE.local.md` |
@@ -63,6 +56,13 @@
 - 슬래시 명령은 `.claude/commands/*.md` 가 아니라 `.claude/skills/<name>/SKILL.md` 로 정의한다(공식 문서가 commands 를 legacy 로 표기).
 - `CLAUDE.md` 는 지시문만 보고 작성하지 않는다. 코드베이스를 읽어야 정확하므로 `/init` 으로 생성한다.
 - 머신 이동 전 반드시 커밋+푸시한다. stash 는 머신을 넘어가지 못한다.
+- 커밋 본문은 이유를 `memory.md` 에 남겼으면 쓰지 않고 **제목만** 커밋한다. 변경 파일 목록은 `git show --stat` 이 대신하므로 본문에 나열하지 않는다. 같은 내용을 git log 와 `memory.md` 두 곳에 두면 갈라졌을 때 어느 쪽이 맞는지 알 수 없다.
+- Git 커밋 메시지 규칙은 `.cursor/rules/unified-workflow.mdc` 와 `CLAUDE.md` 10번에 **둘 다** 둔다. Cursor 는 `CLAUDE.md` 를 읽지 않아 도구마다 자기 파일이 필요하다. 한쪽을 고치면 다른 쪽도 같이 고친다.
+- `/pickup` 은 `disable-model-invocation: true` 라 사용자가 직접 입력해야만 실행되고, 세션 시작 1회뿐이다. 세션이 날짜를 넘길 때의 재동기화가 비어 있어 `CLAUDE.md` 9번에 뒀다. 동기화 절차(미커밋 시 중단, `--ff-only`)는 `pickup/SKILL.md` 에만 두고 9번에서 반복하지 않는다. 경과 시간 기준은 세션 중 확인할 신호가 없어 넣지 않았다. 강제하려면 `SessionStart` 훅이 필요하다.
+- 뼈대 `CLAUDE.md` 는 3단 구조다. **역할·1~9번 지침**(언어 무관) / **공통 기술 규칙**(저장소 무관하게 항상 적용, 예: matplotlib 한글 폰트) / **기술 요구사항**(저장소별, `/init` 이 채움). 특정 저장소 전용 내용을 앞 두 곳에 넣지 않는다.
+- 사용자 역할은 **제어 엔지니어**다. UI·웹 프런트엔드 전제를 깔지 않는다. 단 matplotlib 시각화는 자주 쓴다.
+- 주석 밀도는 **8번 최소 문서화 원칙이 우선**이다. "초보자용 상세 주석"과 충돌할 경우 최소 주석을 따른다.
+- 이 저장소는 뼈대(템플릿)다. `.claude/rules/field-test.md` 의 **안전**·**실차 상태에서 금지하는 동작** TODO 와 `CLAUDE.local.md` 의 **실차 접속**·**로컬 실행 환경** 항목은 여기서 채우지 않고 **공란으로 둔다.** 각 저장소·각 머신에 반영할 때 그곳에서 채운다. 공란은 미완성이 아니라 의도된 상태이므로 미해결 이슈로 올리지 않는다.
 
 ## 이력
 
